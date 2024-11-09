@@ -1,29 +1,29 @@
 import { Module } from "@nestjs/common";
 
-import { TransportModule } from "./Transporter";
-import { SendEmailListenerController } from "src/infrastructure/adapters/listeners/SendEmailListenerController";
+import { TransportModule } from "src/infrastructure/modules/Transporter";
+import { NotifyByEmailListenerController } from "src/infrastructure/adapters/listeners/NotifyByEmailListenerController";
 import { NotificationRepositoryAdapter } from "src/infrastructure/adapters/repositories/NotificationRepositoryAdapter";
+
 import { NotificationService } from "src/application/services/NotificationService";
-import { EmailWelcomeUseCaseImpl } from "src/application/usecases/EmailWelcomeUseCaseImpl";
-import { MetaVerificationCodeUseCaseImpl } from "src/application/usecases/MetaVerificationCodeUseCaseImpl";
+import { CreateNotificationUseCaseImpl } from "src/application/usecases/CreateNotificationUseCaseImpl";
 
 @Module({
     imports: [TransportModule],
-    controllers: [SendEmailListenerController],
-    providers: [NotificationService, {
-        provide: "NotificationRepository",
-        useClass: NotificationRepositoryAdapter
-    },
+    controllers: [NotifyByEmailListenerController],
+    providers: [NotificationService,
         {
-            provide: "EmailWelcomeUseCase",
-            useClass: EmailWelcomeUseCaseImpl
+            provide: "NotificationRepository",
+            useClass: NotificationRepositoryAdapter
         },
         {
-            provide: "MetaVerificationCodeUseCase",
-            useClass: MetaVerificationCodeUseCaseImpl
-        }
-
+            provide: "CreateNotificationUseCase",
+            useClass: CreateNotificationUseCaseImpl
+        },
+        // {
+        //     provide: "SendNotificationUseCase",
+        //     useClass: 
+        // }
     ],
     exports: [NotificationModule]
 })
-export class NotificationModule {}
+export class NotificationModule { }

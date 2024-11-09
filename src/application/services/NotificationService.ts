@@ -1,93 +1,27 @@
-import { SMTP_SERVER, SMTP_PORT, EMAIL_ADDRESS, EMAIL_PASSWORD, META_KEY, META_URL } from "src/config/environment";
-
-import { EmailWelcomeUseCase } from "src/domain/ports/in/EmailWelcomeUseCase";
-import { MetaVerificationCodeUseCase } from "src/domain/ports/in/MetaVerificationCodeUseCase";
+import { CreateNotificationUseCase } from "src/domain/ports/in/CreateNotificationUseCase";
+import { SendNotificationUseCase } from "src/domain/ports/in/SendNotification.UseCase";
+import { NotificationDTO } from "src/domain/dtos/NotificationDTO";
 
 import { Injectable, Inject } from "@nestjs/common";
 
-import * as nodemailer from "nodemailer";
-import axios from "axios";
+type buildNotification = () => void;
 
 @Injectable()
-export class NotificationService implements EmailWelcomeUseCase, MetaVerificationCodeUseCase {
-    private transporter: nodemailer.Transporter;
+export class NotificationService implements CreateNotificationUseCase {
     constructor(
-        @Inject('EmailWelcomeUseCase') private readonly emailWelcomeUseCase: EmailWelcomeUseCase,
-        @Inject('MetaVerificationCodeUseCase') private readonly metaVerificationCodeUseCase: MetaVerificationCodeUseCase
-    ){
-        this.transporter = nodemailer.createTransport({
-            host: SMTP_SERVER,
-            port: parseInt(SMTP_PORT),
-            secure: false,
-            auth: {
-                user: EMAIL_ADDRESS,
-                pass: EMAIL_PASSWORD
-            },
-            logger: true,
-            debug: true,
-            tls: {
-                rejectUnauthorized: true,
-            },
-        });
+        @Inject('CreateNotificationUseCase') private readonly createNotificationUseCase: CreateNotificationUseCase,
+        // @Inject('SendNotificationUseCase') private readonly sendNotificationUseCase: SendNotificationUseCase,
+    ){}
+
+    public async createNotification(data: NotificationDTO): Promise<string> {
+        const result = await this.createNotificationUseCase.createNotification(data);
+        console.log(result)
+        return result;
     }
 
-    public async sendEmailWelcome(email: string): Promise<string> {
-        const sendInfo = {
-            from: EMAIL_ADDRESS,
-            to: email,
-            subject: "Welcome to our platform",
-            text: "Welcome to our platform, we are glad to have you here, please complete your register process in the module users to use all the features"
-        };
-        await this.transporter.sendMail(sendInfo);
-        return await this.emailWelcomeUseCase.sendEmailWelcome(email);
-    }
-
-    public async sendMetaVerificationCode(phone: string, code: string): Promise<string> {
-        const response = await axios.post(
-            META_URL,
-            {
-                messaging_product: "whatsapp",
-                recipient_type: "individual",
-                to: `+52${phone}`,
-                type: "template",
-                template: {
-                    name: "authentication",
-                    language: {
-                        code: "en_US"
-                    },
-                    components: [
-                        {
-                            type: "body",
-                            parameters: [
-                                {
-                                    type: "text",
-                                    text: code
-                                }
-                            ]
-                        },
-                        {
-                            type: "button",
-                            sub_type: "url",
-                            index: "0",
-                            parameters: [
-                                {
-                                    type: "text",
-                                    text: code
-                                }
-                            ]
-                        }
-                    ]
-                }
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${META_KEY}`  // Token de acceso de Meta
-                }
-            }
-        );
-        console.log(response)
-        return response.data;
-        // return await this.metaVerificationCodeUseCase.sendMetaVerificationCode(phone);
+    public sendNotification(build: buildNotification): string {
+        // this.sendNotificationUseCase.buildNotification();
+        build();
+        return "Notification Sent";
     }
 }
