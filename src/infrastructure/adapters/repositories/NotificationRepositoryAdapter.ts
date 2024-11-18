@@ -66,6 +66,8 @@ export class NotificationRepositoryAdapter extends PrismaClient implements OnMod
     }
 
     private toNotificationResponse(notification: NotificationDTO): Notification {
-        return new Notification(notification.contact_uuid, notification.send_date, notification.sent_at, notification.type);
+        const notificationTransform = new Notification(notification.contact_uuid, notification.send_date, notification.sent_at, notification.type);
+        notificationTransform.uuid = notification.uuid;
+        return notificationTransform;
     }
 }
