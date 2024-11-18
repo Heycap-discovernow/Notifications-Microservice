@@ -1,5 +1,3 @@
-import { NotificationDTO } from "src/domain/dtos/NotificationDTO";
-
 export interface CreateNotificationUseCase {
-    createNotification(data: NotificationDTO ): Promise<string>;
+    createNotification(contact_uuid: string, channel: string, type: string): Promise<string>;
 }

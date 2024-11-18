@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 
 import { TransportModule } from "src/infrastructure/modules/Transporter";
-import { NotifyByEmailListenerController } from "src/infrastructure/adapters/listeners/NotifyByEmailListenerController";
+import { NotifyListenerController } from "../adapters/listeners/NoticationListenerController";
 import { NotificationRepositoryAdapter } from "src/infrastructure/adapters/repositories/NotificationRepositoryAdapter";
 
 import { NotificationService } from "src/application/services/NotificationService";
@@ -9,7 +9,7 @@ import { CreateNotificationUseCaseImpl } from "src/application/usecases/CreateNo
 
 @Module({
     imports: [TransportModule],
-    controllers: [NotifyByEmailListenerController],
+    controllers: [NotifyListenerController],
     providers: [NotificationService,
         {
             provide: "NotificationRepository",
@@ -19,10 +19,6 @@ import { CreateNotificationUseCaseImpl } from "src/application/usecases/CreateNo
             provide: "CreateNotificationUseCase",
             useClass: CreateNotificationUseCaseImpl
         },
-        // {
-        //     provide: "SendNotificationUseCase",
-        //     useClass: 
-        // }
     ],
     exports: [NotificationModule]
 })

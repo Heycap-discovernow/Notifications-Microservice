@@ -1,20 +1,16 @@
 import { META_KEY, META_URL } from "src/config/environment";
 
-import { SendNotificationUseCase } from "src/domain/ports/in/SendNotification.UseCase";
+import { SendNotificationUseCase } from "src/domain/ports/in/SendNotificationUseCase";
 
 import axios from "axios";
 
 export class WhatsappBuilder implements SendNotificationUseCase {
     public phone: string;
     public message: string;
-    public user_uuid?: string;
-    public contact_uuid?: string;
 
-    constructor(destination: string, message: string, user_uuid?: string, contact_uuid?: string) {
+    constructor(destination: string, message: string) {
         this.phone = destination;
         this.message = message;
-        this.user_uuid = user_uuid;
-        this.contact_uuid = contact_uuid;
     }
 
     public async buildNotification(): Promise<void> {
@@ -61,7 +57,6 @@ export class WhatsappBuilder implements SendNotificationUseCase {
                 }
             }
         );
-        console.log(response)
-        // return response.data;
+        console.log(response.data);
     }
 }
