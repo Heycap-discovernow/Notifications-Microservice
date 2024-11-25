@@ -5,7 +5,6 @@ import { SentAt } from "src/domain/value_objects/SendedAt";
 
 import { PrismaClient } from "@prisma/client";
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { not } from "joi";
 import { NotificationType } from "src/domain/value_objects/NotificationType";
 
 @Injectable()

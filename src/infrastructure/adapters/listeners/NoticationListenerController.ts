@@ -30,6 +30,9 @@ export class NotifyListenerController {
                     this.notificationService.sendNotification(sendInfo);
                     break;
                 default:
+                    const defaultBuilder = new WhatsappBuilder(data.to, data.message);
+                    sendInfo = new SendNotificationDTO(() => defaultBuilder.buildNotification(), data.contact_uuid, data.channel, data.type);
+                    this.notificationService.sendNotification(sendInfo);
                     break;
             }
         } catch (error) {
