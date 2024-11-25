@@ -1,4 +1,4 @@
-export enum SendedAt {
+export enum SentAt {
     EMAIL = "EMAIL",
     WHATSAPP = "WHATSAPP"
 }

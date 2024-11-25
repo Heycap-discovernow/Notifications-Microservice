@@ -1,9 +1,11 @@
 import { NotificationRepository } from "src/domain/ports/out/NotificationRepository";
 import { Notification } from "src/domain/models/Notification";
 import { NotificationDTO } from "src/domain/dtos/NotificationDTO";
+import { SentAt } from "src/domain/value_objects/SendedAt";
 
 import { PrismaClient } from "@prisma/client";
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { NotificationType } from "src/domain/value_objects/NotificationType";
 
 @Injectable()
 export class NotificationRepositoryAdapter extends PrismaClient implements OnModuleInit, NotificationRepository {
@@ -11,29 +13,27 @@ export class NotificationRepositoryAdapter extends PrismaClient implements OnMod
         await this.$connect();
     }
 
-    public async saveNotification(notification: NotificationDTO): Promise<string> {
-        // const code = Math.floor(1000 + Math.random() * 9000).toString();
+    public async saveNotification(notification: NotificationDTO): Promise<void> {
         const save = await this.notification.create({
             data: {
                 uuid: notification.uuid,
-                user_uuid: notification.user_uuid,
-                send_date: notification.type,
+                send_date: notification.send_date,
+                sent_at: notification.sent_at,
                 type: notification.type,
+                contact_uuid: notification.contact_uuid
             }
         });
 
         if (!save) {
             throw new Error("Error saving notification");
         }
-
-        return "Notification Sent";
     }
 
-    public async getNotification(user_uuid: string, notification_uuid: string): Promise<string> {
+    public async getNotification(contact_uuid: string, notification_uuid: string): Promise<Notification> {
         const notification = await this.notification.findUnique({
             where: {
                 uuid: notification_uuid,
-                user_uuid: user_uuid
+                contact_uuid: contact_uuid
             }
         });
 
@@ -41,14 +41,14 @@ export class NotificationRepositoryAdapter extends PrismaClient implements OnMod
             throw new Error("Notification not found");
         }
 
-        return "Notification found";
+        const toNotification = {...notification, sent_at: SentAt[notification.sent_at], type: NotificationType[notification.type]};
+        return this.toNotificationResponse(toNotification);
     }
 
-    // public async getAllNotification(user_uuid: string): Promise<Notification[]> {
-    public async getAllNotification(user_uuid: string): Promise<string> {
+    public async getAllNotification(contact_uuid: string): Promise<Notification[]> {
         const result = await this.notification.findMany({
             where: {
-                user_uuid: user_uuid
+                contact_uuid: contact_uuid
             }
         });
 
@@ -56,8 +56,17 @@ export class NotificationRepositoryAdapter extends PrismaClient implements OnMod
             throw new Error("Notifications not found");
         }
 
-        //crear un toNotificationResponse para mapear el resultado
-        // return result;
-        return "Notifications found";
+        const notifications = result.map((notification) => {
+            const toNotification = {...notification, sent_at: SentAt[notification.sent_at], type: NotificationType[notification.type]};
+            return this.toNotificationResponse(toNotification);
+        });
+
+        return notifications;
+    }
+
+    private toNotificationResponse(notification: NotificationDTO): Notification {
+        const notificationTransform = new Notification(notification.contact_uuid, notification.send_date, notification.sent_at, notification.type);
+        notificationTransform.uuid = notification.uuid;
+        return notificationTransform;
     }
 }

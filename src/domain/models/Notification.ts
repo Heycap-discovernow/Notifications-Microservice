@@ -1,4 +1,5 @@
 import { NotificationType } from "src/domain/value_objects/NotificationType";
+import { SentAt } from "src/domain/value_objects/SendedAt";
 
 import { IsUUID, IsDate, IsEnum } from "class-validator";
 import { v4 as uuidv4 } from 'uuid';
@@ -8,22 +9,22 @@ export class Notification {
     public uuid: string;
 
     @IsUUID()
-    public user_uuid: string;
+    public contact_uuid: string;
 
     @IsDate()
-    public sendDate: Date;
+    public send_date: Date;
     
+    @IsEnum(SentAt)
+    public sent_at: SentAt;
+
     @IsEnum(NotificationType)
     public type: NotificationType;
 
-    @IsUUID()
-    public contact_uuid?: string;
-
-    constructor(user_uuid: string, sendDate: Date, type: NotificationType, contact_uuid?: string) {
+    constructor(contact_uuid: string, sendDate: Date, sendedAt: SentAt, type: NotificationType) {
         this.uuid = uuidv4();
-        this.user_uuid = user_uuid;
-        this.sendDate = sendDate;
-        this.type = type;
         this.contact_uuid = contact_uuid;
+        this.send_date = sendDate;
+        this.sent_at = sendedAt;
+        this.type = type;
     }
 }

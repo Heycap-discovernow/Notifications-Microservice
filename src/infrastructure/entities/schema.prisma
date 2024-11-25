@@ -14,9 +14,10 @@ datasource db {
 }
 
 model notification {
-  notification_id   Int      @id @default(autoincrement())
-  uuid              String   @unique @db.VarChar
-  user_uuid         String   @db.VarChar
-  send_date         DateTime @default(now()) @db.Timestamp(6)
-  type              String   @db.VarChar
+  notification_id Int      @id @default(autoincrement())
+  uuid            String   @unique @db.VarChar
+  contact_uuid    String   @db.VarChar
+  send_date       DateTime @default(now()) @db.Timestamp(6)
+  sent_at         String   @db.VarChar
+  type            String   @db.VarChar
 }

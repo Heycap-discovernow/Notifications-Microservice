@@ -1,6 +1,6 @@
 import { SMTP_SERVER, SMTP_PORT, EMAIL_ADDRESS, EMAIL_PASSWORD } from "src/config/environment";
 
-import { SendNotificationUseCase } from "src/domain/ports/in/SendNotification.UseCase";
+import { SendNotificationUseCase } from "src/domain/ports/in/SendNotificationUseCase";
 
 import { Injectable } from "@nestjs/common";
 
@@ -12,10 +12,8 @@ export class EmailBuilder implements SendNotificationUseCase {
     public destination: string;
     public message: string;
     public subject: string;
-    public user_uuid?: string;
-    public contact_uuid?: string;
 
-    constructor(email: string, message: string, subject: string, user_uuid?: string, contact_uuid?: string) {
+    constructor(email: string, message: string, subject: string) {
         this.transporter = nodemailer.createTransport({
             host: SMTP_SERVER,
             port: parseInt(SMTP_PORT),
@@ -33,9 +31,8 @@ export class EmailBuilder implements SendNotificationUseCase {
         this.destination = email;
         this.message = message;
         this.subject = subject;
-        this.user_uuid = user_uuid;
-        this.contact_uuid = contact_uuid;
     }
+
     public buildNotification(): void {
         const sendInfo = {
             from: EMAIL_ADDRESS,
